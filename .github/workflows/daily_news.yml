@@ -28,30 +28,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r news_aggregator/requirements.txt
       
-      # Step 4: Create .env file from secrets
-      - name: Create .env file
-        run: |
-          cat > news_aggregator/.env << EOF
-          NEWSAPI_KEY=${{ secrets.NEWSAPI_KEY }}
-          SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
-          SENDER_PASSWORD=${{ secrets.SENDER_PASSWORD }}
-          RECIPIENT_EMAIL=${{ secrets.RECIPIENT_EMAIL }}
-          NEWS_TOPIC=${{ secrets.NEWS_TOPIC }}
-          DAILY_HOUR=7
-          DAILY_MINUTE=0
-          EOF
-      
-      # Step 5: Run the news digest sender
+      # Step 4: Run the news digest sender
       - name: Send news digest
         working-directory: news_aggregator
+        env:
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          NEWS_TOPIC: ${{ secrets.NEWS_TOPIC }}
         run: |
           python -c "
           from news_fetcher import NewsFetcher
           from email_sender import EmailSender
           import os
-          from dotenv import load_dotenv
-          
-          load_dotenv()
           
           # Fetch articles
           fetcher = NewsFetcher()
@@ -69,6 +59,7 @@ jobs:
               articles=articles,
               topic=os.getenv('NEWS_TOPIC')
           )
+          "
           "
       
       # Step 6: Log success
