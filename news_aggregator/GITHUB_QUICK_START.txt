@@ -1,0 +1,98 @@
+# 📋 GITHUB ACTIONS - QUICK CHECKLIST (5 Steps)
+
+## ✅ Step 1: Create GitHub Account (2 minutes)
+- [ ] Go to https://github.com
+- [ ] Click Sign Up
+- [ ] Verify email
+
+## ✅ Step 2: Create Repository (1 minute)
+- [ ] Click **+** icon → **New repository**
+- [ ] Name: `news-aggregator`
+- [ ] Choose **Public**
+- [ ] Click **Create repository**
+
+## ✅ Step 3: Push Your Code (3 minutes)
+Open PowerShell in your `news_aggregator` folder and run:
+
+```powershell
+git init
+git config user.name "Your Name"
+git config user.email "your@email.com"
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/news-aggregator.git
+git branch -M main
+git push -u origin main
+```
+
+When asked for password: Create a Personal Access Token at https://github.com/settings/tokens (check `repo` and `workflow` scopes)
+
+## ✅ Step 4: Add Secrets (2 minutes)
+1. Go to your repository on GitHub
+2. Click **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret** for each:
+
+```
+NEWSAPI_KEY = your_api_key
+SENDER_EMAIL = antoundany4@gmail.com
+SENDER_PASSWORD = your_app_password_no_spaces
+RECIPIENT_EMAIL = antoundany4@gmail.com
+NEWS_TOPIC = Lebanon israel war
+```
+
+## ✅ Step 5: Test It (1 minute)
+1. Click **Actions** tab in GitHub
+2. Click **Daily News Digest** workflow
+3. Click **Run workflow** → **Run workflow** button
+4. Wait 2 minutes
+5. Check your email! ✉️
+
+---
+
+## 🎉 DONE!
+
+Your news aggregator is now running in the cloud!
+
+It will send an email automatically every day at **7:00 AM UTC**.
+
+To change the time, see **GITHUB_ACTIONS_SETUP.md**.
+
+---
+
+## 🔒 Security Checklist
+
+- [ ] `.env` file is in `.gitignore` (don't push it!)
+- [ ] All secrets are in GitHub (Settings → Secrets)
+- [ ] Repository is PUBLIC (required for free GitHub Actions)
+- [ ] Never paste actual credentials in any file
+
+---
+
+## 📞 Troubleshooting
+
+**"Push failed with authentication error"**
+→ Use a Personal Access Token, not your password
+→ Get one at https://github.com/settings/tokens
+
+**"Workflow doesn't run"**
+→ Check Actions tab → make sure workflow is enabled (green checkmark)
+
+**"Email not received"**
+→ Check Actions tab → view logs
+→ Verify all secrets are correct
+
+**"Can't find Actions tab"**
+→ Make sure repository is PUBLIC, not private
+
+---
+
+## 📊 Status Dashboard
+
+Check your workflow runs anytime:
+1. Go to GitHub
+2. Click **Actions** tab
+3. See all past runs with logs
+
+---
+
+**That's it! You're all set! 🚀**
