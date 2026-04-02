@@ -5,7 +5,7 @@ import schedule
 import time
 import os
 from dotenv import load_dotenv
-from news_fetcher import NewsFetcher
+from rss_fetcher import RSSNewsFetcher
 from email_sender import EmailSender
 from datetime import datetime
 
@@ -36,7 +36,7 @@ class NewsScheduler:
             self.news_keywords = None
         
         # Initialize components
-        self.fetcher = NewsFetcher()
+        self.fetcher = RSSNewsFetcher()
         self.mailer = EmailSender()
         
         self.is_running = False
@@ -49,11 +49,11 @@ class NewsScheduler:
         print(f"{'='*60}")
         
         try:
-            # Fetch articles
-            articles = self.fetcher.fetch_articles(
+            # Fetch articles from RSS and apply filter keywords
+            articles = self.fetcher.search_articles(
                 query=self.news_topic,
-                page_size=15,
-                keywords=self.news_keywords
+                keywords=self.news_keywords,
+                limit=15
             )
             
             if not articles:

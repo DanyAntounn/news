@@ -81,27 +81,40 @@ class RSSNewsFetcher:
         
         return all_articles
     
-    def search_articles(self, query: str, limit: int = 15) -> List[Dict]:
+    def search_articles(self, query: str = None, keywords: List[str] = None, limit: int = 15) -> List[Dict]:
         """
-        Fetch articles and filter by keyword
+        Fetch articles and filter by query/keywords
         
         Args:
             query: Search keyword (e.g., 'Lebanon', 'technology')
+            keywords: Optional list of keywords to match (case-insensitive OR)
             limit: Maximum articles to return
         
         Returns:
             Filtered list of articles
         """
         all_articles = self.fetch_all_feeds(limit_per_feed=10)
-        
-        # Filter articles by keyword
-        query_lower = query.lower()
-        filtered = [
-            article for article in all_articles
-            if query_lower in article['title'].lower() or 
-               query_lower in article['summary'].lower()
-        ]
-        
+
+        # Normalize values
+        query_lower = query.lower() if query else None
+        keywords_norm = [kw.strip().lower() for kw in keywords] if keywords else None
+
+        def matches(article):
+            title = article['title'].lower()
+            summary = article['summary'].lower()
+
+            if keywords_norm:
+                for kw in keywords_norm:
+                    if kw and (kw in title or kw in summary):
+                        return True
+                return False
+
+            if query_lower:
+                return query_lower in title or query_lower in summary
+
+            return True
+
+        filtered = [article for article in all_articles if matches(article)]
         return filtered[:limit]
 
 

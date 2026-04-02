@@ -34,8 +34,9 @@ jobs:
         env:
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
-          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          RECIPIENT_EMAILS: ${{ secrets.RECIPIENT_EMAILS }}
           NEWS_TOPIC: ${{ secrets.NEWS_TOPIC }}
+          NEWS_KEYWORDS: ${{ secrets.NEWS_KEYWORDS }}
         run: |
           python -c "
           from rss_fetcher import RSSNewsFetcher
@@ -44,17 +45,22 @@ jobs:
           
           # Fetch articles from RSS feeds
           fetcher = RSSNewsFetcher()
+          keywords_str = os.getenv('NEWS_KEYWORDS')
+          keywords = [kw.strip() for kw in keywords_str.split(',')] if keywords_str else None
+          
           articles = fetcher.search_articles(
-              query=os.getenv('NEWS_TOPIC', 'world'),
+              query=os.getenv('NEWS_TOPIC', ''),
+              keywords=keywords,
               limit=15
           )
           
           print(f'Found {len(articles)} articles')
           
-          # Send email
+          # Send email to multiple recipients
           mailer = EmailSender()
+          recipient_emails = [email.strip() for email in os.getenv('RECIPIENT_EMAILS', '').split(',') if email.strip()]
           mailer.send_email(
-              recipient_email=os.getenv('RECIPIENT_EMAIL'),
+              recipient_emails=recipient_emails,
               articles=articles,
               topic=os.getenv('NEWS_TOPIC', 'world')
           )

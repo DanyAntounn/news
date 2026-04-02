@@ -75,11 +75,11 @@ Your API keys and passwords need to be stored securely as "Secrets":
 
 | Secret Name | Value |
 |---|---|
-| `NEWSAPI_KEY` | Your NewsAPI key |
 | `SENDER_EMAIL` | antoundany4@gmail.com |
 | `SENDER_PASSWORD` | Your Gmail app password |
 | `RECIPIENT_EMAILS` | antoundany4@gmail.com (comma-separated for multiple) |
 | `NEWS_TOPIC` | Lebanon israel war |
+| `NEWS_KEYWORDS` | Lebanon, Israel, Palestine, Hezbollah, Hamas |
 
 **Important**: Each secret is encrypted and never shown in logs!
 

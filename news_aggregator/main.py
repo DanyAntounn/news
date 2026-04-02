@@ -87,13 +87,14 @@ def main():
                 print(f"✗ Error: {e}")
         
         elif choice == '6':
-            # Test NewsAPI
-            print("\n🔍 Testing NewsAPI connection...")
+            # Test RSS feeds
+            print("\n🔍 Testing RSS feeds connection...")
             try:
-                fetcher = NewsFetcher()
-                articles = fetcher.fetch_articles('test', page_size=1)
+                from rss_fetcher import RSSNewsFetcher
+                fetcher = RSSNewsFetcher()
+                articles = fetcher.search_articles('test', limit=1)
                 if articles:
-                    print(f"✓ NewsAPI is working!")
+                    print(f"✓ RSS source is working!")
                     print(f"  Sample article: {articles[0]['title'][:50]}...")
                 else:
                     print("✗ Could not fetch articles")

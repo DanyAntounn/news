@@ -49,11 +49,9 @@ cd news_aggregator
 pip install -r requirements.txt
 ```
 
-### 3. Get a NewsAPI Key
+### 3. RSS News Feed (no API key required)
 
-1. Visit [NewsAPI.org](https://newsapi.org/)
-2. Sign up for a free account
-3. Copy your API key
+This project uses RSS feeds from major news sites, so you do not need a NewsAPI key.
 
 ### 4. Create Gmail App Password
 
@@ -69,13 +67,13 @@ pip install -r requirements.txt
 2. Fill in your credentials:
 
 ```env
-NEWSAPI_KEY=your_newsapi_key_here
 SENDER_EMAIL=your_email@gmail.com
 SENDER_PASSWORD=your_gmail_app_password_here
 RECIPIENT_EMAILS=recipient@example.com
 DAILY_HOUR=7
 DAILY_MINUTE=0
 NEWS_TOPIC=Lebanon israel war
+NEWS_KEYWORDS=Lebanon, Israel, Palestine, Hezbollah, Hamas
 ```
 
 ## Usage
@@ -102,20 +100,19 @@ From the interactive menu:
 - **Option 3**: Change the news topic
 - **Option 4**: View current topic
 - **Option 5**: Test email connection
-- **Option 6**: Test NewsAPI connection
+- **Option 6**: Test RSS source connection
 
 ## Configuration
 
 Edit `.env` to customize:
 
-- `NEWSAPI_KEY`: Your NewsAPI key
 - `SENDER_EMAIL`: Your Gmail address
 - `SENDER_PASSWORD`: Gmail app password
 - `RECIPIENT_EMAILS`: Where to send digests (comma-separated for multiple)
 - `DAILY_HOUR`: Hour for daily delivery (0-23)
 - `DAILY_MINUTE`: Minute for daily delivery (0-59)
-- `NEWS_TOPIC`: Topic to search (e.g., "Lebanon israel war", "technology", "sports")
-  - Supports NewsAPI operators: AND, OR, NOT, quotes for phrases
+- `NEWS_TOPIC`: Keyword or phrase to match in RSS title/description
+- `NEWS_KEYWORDS`: Optional comma-separated list of additional keywords (OR match)
   - Example: `"Lebanon" AND ("Israel" OR "Palestine") AND ("war" OR "conflict")`
 - `NEWS_KEYWORDS`: Comma-separated keywords for additional filtering (optional)
   - Articles must contain at least one keyword in title or description
