@@ -27,6 +27,38 @@ class RSSNewsFetcher:
     def __init__(self):
         """Initialize RSS news fetcher"""
         pass
+
+    # Common country names (lowercase). Used to detect country-related conflict news.
+    COMMON_COUNTRIES = [
+        "afghanistan","albania","algeria","andorra","angola","antigua and barbuda",
+        "argentina","armenia","australia","austria","azerbaijan","bahamas","bahrain",
+        "bangladesh","barbados","belarus","belgium","belize","benin","bhutan","bolivia",
+        "bosnia and herzegovina","botswana","brazil","brunei","bulgaria","burkina faso",
+        "burundi","cambodia","cameroon","canada","cape verde","central african republic",
+        "chad","chile","china","colombia","comoros","congo","costa rica","cote d'ivoire",
+        "croatia","cuba","cyprus","czechia","czech republic","denmark","djibouti","dominica",
+        "dominican republic","ecuador","egypt","el salvador","equatorial guinea","eritrea",
+        "estonia","eswatini","ethiopia","fiji","finland","france","gabon","gambia","georgia",
+        "germany","ghana","greece","grenada","guatemala","guinea","guinea-bissau","guyana",
+        "haiti","honduras","hungary","iceland","india","indonesia","iran","iraq","ireland",
+        "israel","italy","jamaica","japan","jordan","kazakhstan","kenya","kiribati","kuwait",
+        "kyrgyzstan","laos","latvia","lebanon","lesotho","liberia","libya","liechtenstein",
+        "lithuania","luxembourg","madagascar","malawi","malaysia","maldives","mali","malta",
+        "marshall islands","mauritania","mauritius","mexico","micronesia","moldova","monaco",
+        "mongolia","montenegro","morocco","mozambique","myanmar","namibia","nauru","nepal",
+        "netherlands","new zealand","nicaragua","niger","nigeria","north korea","north macedonia",
+        "norway","oman","pakistan","palau","panama","papua new guinea","paraguay","peru",
+        "philippines","poland","portugal","qatar","romania","russia","russian federation",
+        "rwanda","saint kitts and nevis","saint lucia","saint vincent and the grenadines",
+        "samoa","san marino","sao tome and principe","saudi arabia","senegal","serbia",
+        "seychelles","sierra leone","singapore","slovakia","slovenia","solomon islands",
+        "somalia","south africa","south korea","south sudan","spain","sri lanka","sudan",
+        "suriname","sweden","switzerland","syria","taiwan","tajikistan","tanzania","thailand",
+        "timor-leste","togo","tonga","trinidad and tobago","tunisia","turkey","turkmenistan",
+        "tuvalu","uganda","ukraine","united arab emirates","united kingdom","uk",
+        "united states","usa","u s","uruguay","uzbekistan","vanuatu","vatican city","venezuela",
+        "vietnam","yemen","zambia","zimbabwe"
+    ]
     
     def fetch_from_rss(self, feed_url: str, limit: int = 10) -> List[Dict]:
         """
@@ -103,25 +135,29 @@ class RSSNewsFetcher:
         """
         all_articles = self.fetch_all_feeds(limit_per_feed=10)
 
-        # Build terms from query (supports AND/OR/NOT separators best-effort) and keywords
-        query_terms = []
-        if query:
-            query_terms = [
-                token.lower() for token in re.findall(r"\b[\w'-]+\b", query)
-                if token.lower() not in {'and', 'or', 'not'}
-            ]
+        # Conflict terms and always-include countries
+        conflict_terms = ["war", "attack", "crisis", "ceasefire"]
+        focus_countries = ["lebanon", "israel", "usa", "united states", "u s"]
 
-        keywords_norm = [kw.strip().lower() for kw in keywords] if keywords else []
-        terms = list(dict.fromkeys(query_terms + keywords_norm))
+        def normalize(text: str) -> str:
+            return re.sub(r"[^a-z0-9']+", " ", text.lower()).strip()
+
+        def has_term(norm_text: str, term: str) -> bool:
+            if " " in term:
+                return term in norm_text
+            tokens = set(norm_text.split())
+            return term in tokens
 
         def matches(article):
-            title = article['title'].lower()
-            summary = article['summary'].lower()
+            text = f"{article.get('title','')} {article.get('summary','')}"
+            norm_text = normalize(text)
 
-            # At least one matching term required if any term exists
-            if terms:
-                if not any(term and (term in title or term in summary) for term in terms):
-                    return False
+            has_focus = any(has_term(norm_text, c) for c in focus_countries)
+            has_conflict = any(has_term(norm_text, t) for t in conflict_terms)
+            has_country = any(has_term(norm_text, c) for c in self.COMMON_COUNTRIES)
+
+            if not (has_focus or (has_conflict and has_country)):
+                return False
 
             # Date filter: only articles in last 24 hours, if parse available
             parsed = article.get('published_parsed')
@@ -134,7 +170,7 @@ class RSSNewsFetcher:
             return True
 
         filtered = [article for article in all_articles if matches(article)]
-        print(f"RSS fetch: {len(all_articles)} total, {len(filtered)} filtered using terms: {terms}")
+        print(f"RSS fetch: {len(all_articles)} total, {len(filtered)} filtered")
         if filtered:
             print("Sample articles:")
             for a in filtered[:3]:
